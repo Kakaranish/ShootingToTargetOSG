@@ -15,23 +15,23 @@ osg::Vec4f getColor(int r, int g, int b, int alpha = 255)
     return osg::Vec4f(r / 255., g / 255., b / 255., alpha / 255.);
 }
 
-osg::ref_ptr<osg::MatrixTransform> createShootingTarget(float radius, float thickness = 0.05f)
+osg::ref_ptr<osg::MatrixTransform> createShootingTarget(osg::Vec3f position, float radius, float thickness = 0.05f)
 {
     const float xAxisRotationAngle = -90;
     osg::ref_ptr<osg::Cylinder> blueCylinderShape = new osg::Cylinder(
-        osg::Vec3f(0, 0, 0), radius, thickness);
+        position + osg::Vec3f(0, 0, 0), radius, thickness);
     blueCylinderShape->setRotation(osg::Quat(xAxisRotationAngle, osg::X_AXIS));
     osg::ref_ptr<osg::ShapeDrawable> blueCylinder = new osg::ShapeDrawable(blueCylinderShape);
     blueCylinder->setColor(getColor(30, 144, 255, 255));
 
     osg::ref_ptr<osg::Cylinder> redCylinderShape = new osg::Cylinder(
-        osg::Vec3f(0, 0, thickness), radius / 3. * 2, 0.05f);
+        position + osg::Vec3f(0, 0, thickness), radius / 3. * 2, 0.05f);
     redCylinderShape->setRotation(osg::Quat(xAxisRotationAngle, osg::X_AXIS));
     osg::ref_ptr<osg::ShapeDrawable> redCylinder = new osg::ShapeDrawable(redCylinderShape);
     redCylinder->setColor(getColor(255, 0, 0, 255));
 
     osg::ref_ptr<osg::Cylinder> yellowCylinderShape = new osg::Cylinder(
-        osg::Vec3f(0, 0, thickness + 0.05f), radius / 3., 0.05f);
+        position + osg::Vec3f(0, 0, thickness + 0.05f), radius / 3., 0.05f);
     yellowCylinderShape->setRotation(osg::Quat(xAxisRotationAngle, osg::X_AXIS));
     osg::ref_ptr<osg::ShapeDrawable> yellowCylinder = new osg::ShapeDrawable(yellowCylinderShape);
     yellowCylinder->setColor(getColor(255, 255, 0, 255));
@@ -43,12 +43,36 @@ osg::ref_ptr<osg::MatrixTransform> createShootingTarget(float radius, float thic
     return matrixTransform.release();
 }
 
+osg::ref_ptr<osg::Geode> createCoordinateSystem(float distanceFromZero, float sphereRadius = 1.f){
+    
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+    
+    osg::ref_ptr<osg::ShapeDrawable> xPoint = new osg::ShapeDrawable(
+        new osg::Sphere(osg::Vec3f(distanceFromZero, 0, 0), sphereRadius));
+    xPoint->setColor(getColor(255, 255, 255,255));
+    geode->addDrawable(xPoint);
+    
+    osg::ref_ptr<osg::ShapeDrawable> yPoint = new osg::ShapeDrawable(
+        new osg::Sphere(osg::Vec3f(0, distanceFromZero, 0), sphereRadius));
+    yPoint->setColor(getColor(255, 255, 255,255));
+    geode->addDrawable(yPoint);
+
+    osg::ref_ptr<osg::ShapeDrawable> zPoint = new osg::ShapeDrawable(
+        new osg::Sphere(osg::Vec3f(0, 0, distanceFromZero), sphereRadius));
+    zPoint->setColor(getColor(255, 255, 255,255));
+    geode->addDrawable(zPoint);
+
+    return geode.release();
+}
+
 int main(int argc, char const *argv[])
 {
     osg::ref_ptr<osg::Group> root = new osg::Group;
-    osg::ref_ptr<osg::MatrixTransform> shootingTarget = createShootingTarget(3, 0.1f);
+    osg::ref_ptr<osg::Geode> coordinateSystem = createCoordinateSystem(5, 0.5f);
+    osg::ref_ptr<osg::MatrixTransform> shootingTarget = createShootingTarget(osg::Vec3f(0, 0, 0), 3, 0.1f);
 
     root->addChild(shootingTarget);
+    root->addChild(coordinateSystem);
 
     osgViewer::Viewer viewer;
     viewer.setUpViewInWindow(100, 100, 800, 600);
