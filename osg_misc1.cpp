@@ -24,16 +24,17 @@ public:
         _radius = radius;
         _thickness = thickness;
 
-
-        _shootingTarget = createShootingTarget(_postion, _radius, _thickness);
-        _platform = NULL;
+        _shootingTarget = createShootingTarget();
+        _platform = createShootingTargetPlatform();
     }
 
-    osg::ref_ptr<osg::MatrixTransform> getShootingTarget(){
+    osg::ref_ptr<osg::MatrixTransform> getShootingTarget()
+    {
         return _shootingTarget;
     }
 
-    osg::ref_ptr<osg::Geode> getPlatform(){
+    osg::ref_ptr<osg::Geode> getPlatform()
+    {
         return _platform;
     }
 
@@ -44,33 +45,34 @@ private:
     float _radius;
     float _thickness;
 
-    osg::ref_ptr<osg::MatrixTransform> createShootingTarget(osg::Vec3f position, float radius, float thickness = 0.05f)
+    osg::ref_ptr<osg::MatrixTransform> createShootingTarget()
     {
         const float xAxisRotationAngle = osg::PI_2;
-        float stickLength = radius / 5. * 4.;
-        position += osg::Vec3f(0, 0, 1 * (radius + stickLength));
+        float stickLength = _radius / 5. * 4.;
+        osg::Vec3f position(_postion);
+        position += osg::Vec3f(0, 0, 1 * (_radius + stickLength + (getPlatformHeight() / 2.f)));
 
         osg::ref_ptr<osg::Cylinder> blueCylinderShape = new osg::Cylinder(
-            position + osg::Vec3f(0, 0, 0), radius, thickness);
+            position + osg::Vec3f(0, 0, 0), _radius, _thickness);
         blueCylinderShape->setRotation(osg::Quat(xAxisRotationAngle, osg::X_AXIS));
         osg::ref_ptr<osg::ShapeDrawable> blueCylinder = new osg::ShapeDrawable(blueCylinderShape);
         blueCylinder->setColor(getColor(30, 144, 255, 255));
 
         osg::ref_ptr<osg::Cylinder> redCylinderShape = new osg::Cylinder(
-            position + osg::Vec3f(0, -thickness, 0), radius / 3. * 2, 0.05f);
+            position + osg::Vec3f(0, -_thickness, 0), _radius / 3. * 2, 0.05f);
         redCylinderShape->setRotation(osg::Quat(xAxisRotationAngle, osg::X_AXIS));
         osg::ref_ptr<osg::ShapeDrawable> redCylinder = new osg::ShapeDrawable(redCylinderShape);
         redCylinder->setColor(getColor(255, 0, 0));
 
         osg::ref_ptr<osg::Cylinder> yellowCylinderShape = new osg::Cylinder(
-            position + osg::Vec3f(0, -(thickness + 0.05f), 0), radius / 3., 0.05f);
+            position + osg::Vec3f(0, -(_thickness + 0.05f), 0), _radius / 3., 0.05f);
         yellowCylinderShape->setRotation(osg::Quat(xAxisRotationAngle, osg::X_AXIS));
         osg::ref_ptr<osg::ShapeDrawable> yellowCylinder = new osg::ShapeDrawable(yellowCylinderShape);
         yellowCylinder->setColor(getColor(255, 255, 0));
 
         osg::ref_ptr<osg::ShapeDrawable> stickDrawable = new osg::ShapeDrawable(
-            new osg::Box(osg::Vec3(position.x(), position.y(), position.z() - 1 * (radius + stickLength / 2.f)),
-                         thickness * 3, thickness, stickLength));
+            new osg::Box(osg::Vec3(position.x(), position.y(), position.z() - 1 * (_radius + stickLength / 2.f)),
+                         _thickness * 3, _thickness, stickLength));
         stickDrawable->setColor(getColor(139, 69, 19));
 
         osg::ref_ptr<osg::MatrixTransform> matrixTransform = new osg::MatrixTransform;
@@ -79,6 +81,29 @@ private:
         matrixTransform->addChild(yellowCylinder);
         matrixTransform->addChild(stickDrawable);
         return matrixTransform.release();
+    }
+
+    osg::ref_ptr<osg::Geode> createShootingTargetPlatform()
+    {
+        osg::Vec3f position(_postion);
+        position -= osg::Vec3f(0, 0, -1 * (getPlatformHeight() / 2.));
+        osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+        osg::ref_ptr<osg::Box> box = new osg::Box(position, getPlatformWidth(),
+                                                  getPlatformHeight(), getPlatformHeight());
+        osg::ref_ptr<osg::ShapeDrawable> groundDrawable(new osg::ShapeDrawable(box));
+        groundDrawable->setColor(getColor(169, 169, 169));
+        geode->addDrawable(groundDrawable);
+        return geode;
+    }
+
+    float getPlatformWidth()
+    {
+        return 4. * _radius;
+    }
+
+    float getPlatformHeight()
+    {
+        return 1. / 3. * _radius;
     }
 };
 
@@ -124,9 +149,11 @@ int main(int argc, char const *argv[])
 
     ShootingTarget shootingTarget(osg::Vec3f(0, 2.f, 0), 1.5, 0.1f);
     osg::ref_ptr<osg::MatrixTransform> shootingTargetMatrix = shootingTarget.getShootingTarget();
+    osg::ref_ptr<osg::Geode> shootingTargetPlatformGeode = shootingTarget.getPlatform();
 
     root->addChild(ground);
     root->addChild(shootingTargetMatrix);
+    root->addChild(shootingTargetPlatformGeode);
     root->addChild(coordinateSystem);
 
     osgViewer::Viewer viewer;
