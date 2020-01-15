@@ -12,6 +12,8 @@
 #include <osgGA/GUIEventHandler>
 #include <osgGA/GUIEventAdapter>
 #include <osgGA/GUIActionAdapter>
+#include "PointOfViewHandler.hpp"
+#include "Player.hpp"
 
 osg::Vec4f getColor(int r, int g, int b, int alpha = 255)
 {
@@ -287,70 +289,70 @@ public:
     }
 };
 
-class PointOfViewHandler : public osgGA::GUIEventHandler
-{
-    osg::observer_ptr<osgViewer::Viewer> _viewer;
-    bool allowEventFocus;
+// class PointOfViewHandler : public osgGA::GUIEventHandler
+// {
+//     osg::observer_ptr<osgViewer::Viewer> _viewer;
+//     bool allowEventFocus;
 
-public:
-    bool handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
-    {
-        if (ea.getEventType() != osgGA::GUIEventAdapter::KEYDOWN)
-        {
-            return false;
-        }
+// public:
+//     bool handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
+//     {
+//         if (ea.getEventType() != osgGA::GUIEventAdapter::KEYDOWN)
+//         {
+//             return false;
+//         }
 
-        switch (ea.getUnmodifiedKey())
-        {
-        case osgGA::GUIEventAdapter::KEY_Up:
-            std::cout << "Key up " << allowEventFocus << std::endl;
-            break;
-        case osgGA::GUIEventAdapter::KEY_Right:
-            std::cout << "Key right" << std::endl;
-            break;
-        case osgGA::GUIEventAdapter::KEY_Down:
-            std::cout << "Key down" << std::endl;
-            break;
-        case osgGA::GUIEventAdapter::KEY_Left:
-            std::cout << "Key left" << std::endl;
-            break;
-        case osgGA::GUIEventAdapter::KEY_Space:
-            std::cout << "Space" << std::endl;
-            break;
-        default:
-            return false;
-        }
+//         switch (ea.getUnmodifiedKey())
+//         {
+//         case osgGA::GUIEventAdapter::KEY_Up:
+//             std::cout << "Key up " << allowEventFocus << std::endl;
+//             break;
+//         case osgGA::GUIEventAdapter::KEY_Right:
+//             std::cout << "Key right" << std::endl;
+//             break;
+//         case osgGA::GUIEventAdapter::KEY_Down:
+//             std::cout << "Key down" << std::endl;
+//             break;
+//         case osgGA::GUIEventAdapter::KEY_Left:
+//             std::cout << "Key left" << std::endl;
+//             break;
+//         case osgGA::GUIEventAdapter::KEY_Space:
+//             std::cout << "Space" << std::endl;
+//             break;
+//         default:
+//             return false;
+//         }
 
-        return true;
-    }
+//         return true;
+//     }
 
-    PointOfViewHandler(const osg::ref_ptr<osgViewer::Viewer> &viewer)
-    {
-        _viewer = viewer;
-        allowEventFocus = true;
+//     PointOfViewHandler(const osg::ref_ptr<osgViewer::Viewer> &viewer)
+//     {
+//         _viewer = viewer;
+//         allowEventFocus = true;
 
-        _viewer->getCamera()->setAllowEventFocus(allowEventFocus);
-    }
+//         _viewer->getCamera()->setAllowEventFocus(allowEventFocus);
+//     }
 
-protected:
-    virtual ~PointOfViewHandler()
-    {
-    }
-};
+// protected:
+//     virtual ~PointOfViewHandler()
+//     {
+//     }
+// };
 
-class Player
-{
-    osg::ref_ptr<osgViewer::Viewer> _viewer;
-    PointOfViewHandler* _pointOfViewHandler;
+// class Player
+// {
+//     osg::ref_ptr<osgViewer::Viewer> _viewer;
+//     PointOfViewHandler* _pointOfViewHandler;
 
-public:
-    Player(osg::ref_ptr<osgViewer::Viewer> viewer)
-    {
-        _viewer = viewer;
-        _pointOfViewHandler = new PointOfViewHandler(_viewer);
+// public:
+//     Player(osg::ref_ptr<osgViewer::Viewer> viewer)
+//     {
+//         _viewer = viewer;
+//         _pointOfViewHandler = new PointOfViewHandler(_viewer);
         
-    }
-};
+//     }
+// };
 
 
 osg::ref_ptr<osg::MatrixTransform> createCannon(osg::Vec3f defaultPosition = osg::Vec3f(0, -20, 0))
@@ -426,8 +428,9 @@ int main(int argc, char const *argv[])
     root->addChild(cannonMatrix);
 
     osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer();
-    osg::ref_ptr<PointOfViewHandler> povh = new PointOfViewHandler(viewer);
-    viewer->addEventHandler(povh.get());
+    Player player(viewer);
+    viewer->addEventHandler(player.getPointOfViewHandler());
+
     viewer->setUpViewInWindow(100, 100, 800, 600);
     viewer->getCamera()->setViewMatrix(osg::Matrix::lookAt(
         osg::Vec3(0, -camYDistance, 2),
