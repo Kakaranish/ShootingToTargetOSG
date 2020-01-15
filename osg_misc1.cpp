@@ -14,11 +14,104 @@
 #include <osgGA/GUIActionAdapter>
 #include "PointOfViewHandler.hpp"
 #include "Player.hpp"
+#include "Cannon.hpp"
+#include "Utility.hpp"
 
-osg::Vec4f getColor(int r, int g, int b, int alpha = 255)
+class SomeCallback : public osg::NodeCallback
 {
-    return osg::Vec4f(r / 255., g / 255., b / 255., alpha / 255.);
-}
+public:
+    osg::ref_ptr<osg::MatrixTransform> ballMatrix;
+    osg::ref_ptr<osg::Geode> toCollide;
+    osg::ref_ptr<osg::Sphere> sphere;
+    osg::ref_ptr<osg::Geode> geode;
+    float speed;
+    float radius;
+    bool finished;
+    float xSpeed;
+
+    SomeCallback(osg::ref_ptr<osg::Geode> _toCollide)
+    {
+        xSpeed = 0.03;
+        finished = false;
+        speed = 0.4;
+        radius = 0.4;
+        toCollide = _toCollide;
+        sphere = new osg::Sphere(osg::Vec3f(0, 0, 6), radius);
+        osg::ref_ptr<osg::ShapeDrawable> ball = new osg::ShapeDrawable(sphere);
+        ball->setColor(getColor(112, 255, 0));
+        geode = new osg::Geode;
+        geode->addDrawable(ball.get());
+
+        ballMatrix = new osg::MatrixTransform;
+        ballMatrix->setUpdateCallback(this);
+        ballMatrix->addChild(geode.get());
+    }
+    void operator()(osg::Node *node, osg::NodeVisitor *nv)
+    {
+        osg::ref_ptr<osg::Geode> x;
+        float acceleration = -0.005;
+        // std::cout << "Hello " << std::endl;
+        // osg::Node* x = ballMatrix->asNode();
+        // std::cout << x << std::endl;
+
+        speed += acceleration;
+        if (speed < -0.3)
+        {
+            speed = -0.3;
+        }
+
+        // std::cout << dynamic_cast<osg::Sphere*>(geode->getChild(0)->asDrawable()) << std::endl;
+        // dynamic_cast<osg::Sphere>
+        // geode->getChild(0)->asDrawable()->getBoundingBox()
+        // std::cout << geode->getChild(0)->asDrawable()->getBoundingBox()<< std::endl;
+        // std::cout << "1st: " << ballMatrix->getBound().center().z() << std::endl;
+        std::cout << ballMatrix->getBound().center().x() << ", " << ballMatrix->getBound().center().y() << ", " << ballMatrix->getBound().center().z() << std::endl;
+        std::cout << ballMatrix->getBound().radius() << std::endl;
+
+        if (ballMatrix->getBound().center().x() >= 3)
+        {
+            xSpeed = 0;
+        }
+        if (finished)
+        {
+            return;
+        }
+        if (ballMatrix->getBound().center().z() == radius)
+        {
+            return;
+        }
+
+        if (ballMatrix->getBound().center().z() < radius)
+        {
+            osg::Vec3f pos = ballMatrix->getMatrix().getTrans();
+            float diff = -ballMatrix->getBound().center().z();
+            pos += osg::Vec3f(0, 0, diff + radius);
+
+            ballMatrix->setMatrix(osg::Matrix::translate(pos));
+            std::cout << "2nd: " << ballMatrix->getBound().center().z() << std::endl;
+            finished = true;
+            return;
+        }
+
+        // // std::cout << pos.z() << std::endl;
+        // // if(pos.z() == radius){
+        // //     return;
+        // // }
+        osg::Vec3f pos = ballMatrix->getMatrix().getTrans();
+        osg::Vec3f newPos = pos + osg::Vec3f(xSpeed, 0, speed);
+        ballMatrix->setMatrix(osg::Matrix::translate(newPos));
+
+        // }
+        // ballMatrix->;
+
+        // osg::ref_ptr<osg::Geode> geode = node->asGeode();
+        // osg::ref_ptr<osg::MatrixTransform> matrix = new osg::MatrixTransform();
+        // matrix->addChild(matrix);
+        // std::cout << "Hello world" << std::endl;
+        // matrix->setMatrix(osg::Matrix::translate(osg::Vec3f(2.0, 2.0, 0)));
+        // std::cout << matrix << std::endl;
+    }
+};
 
 class ShootingTarget
 {
@@ -193,205 +286,6 @@ osg::ref_ptr<osg::Geode> createGround(float width = 15.f, float height = 15.f)
     return geode;
 }
 
-class SomeCallback : public osg::NodeCallback
-{
-public:
-    osg::ref_ptr<osg::MatrixTransform> ballMatrix;
-    osg::ref_ptr<osg::Geode> toCollide;
-    osg::ref_ptr<osg::Sphere> sphere;
-    osg::ref_ptr<osg::Geode> geode;
-    float speed;
-    float radius;
-    bool finished;
-    float xSpeed;
-
-    SomeCallback(osg::ref_ptr<osg::Geode> _toCollide)
-    {
-        xSpeed = 0.03;
-        finished = false;
-        speed = 0.4;
-        radius = 0.4;
-        toCollide = _toCollide;
-        sphere = new osg::Sphere(osg::Vec3f(0, 0, 6), radius);
-        osg::ref_ptr<osg::ShapeDrawable> ball = new osg::ShapeDrawable(sphere);
-        ball->setColor(getColor(112, 255, 0));
-        geode = new osg::Geode;
-        geode->addDrawable(ball.get());
-
-        ballMatrix = new osg::MatrixTransform;
-        ballMatrix->setUpdateCallback(this);
-        ballMatrix->addChild(geode.get());
-    }
-    void operator()(osg::Node *node, osg::NodeVisitor *nv)
-    {
-        osg::ref_ptr<osg::Geode> x;
-        float acceleration = -0.005;
-        // std::cout << "Hello " << std::endl;
-        // osg::Node* x = ballMatrix->asNode();
-        // std::cout << x << std::endl;
-
-        speed += acceleration;
-        if (speed < -0.3)
-        {
-            speed = -0.3;
-        }
-
-        // std::cout << dynamic_cast<osg::Sphere*>(geode->getChild(0)->asDrawable()) << std::endl;
-        // dynamic_cast<osg::Sphere>
-        // geode->getChild(0)->asDrawable()->getBoundingBox()
-        // std::cout << geode->getChild(0)->asDrawable()->getBoundingBox()<< std::endl;
-        // std::cout << "1st: " << ballMatrix->getBound().center().z() << std::endl;
-        std::cout << ballMatrix->getBound().center().x() << ", " << ballMatrix->getBound().center().y() << ", " << ballMatrix->getBound().center().z() << std::endl;
-        std::cout << ballMatrix->getBound().radius() << std::endl;
-
-        if (ballMatrix->getBound().center().x() >= 3)
-        {
-            xSpeed = 0;
-        }
-        if (finished)
-        {
-            return;
-        }
-        if (ballMatrix->getBound().center().z() == radius)
-        {
-            return;
-        }
-
-        if (ballMatrix->getBound().center().z() < radius)
-        {
-            osg::Vec3f pos = ballMatrix->getMatrix().getTrans();
-            float diff = -ballMatrix->getBound().center().z();
-            pos += osg::Vec3f(0, 0, diff + radius);
-
-            ballMatrix->setMatrix(osg::Matrix::translate(pos));
-            std::cout << "2nd: " << ballMatrix->getBound().center().z() << std::endl;
-            finished = true;
-            return;
-        }
-
-        // // std::cout << pos.z() << std::endl;
-        // // if(pos.z() == radius){
-        // //     return;
-        // // }
-        osg::Vec3f pos = ballMatrix->getMatrix().getTrans();
-        osg::Vec3f newPos = pos + osg::Vec3f(xSpeed, 0, speed);
-        ballMatrix->setMatrix(osg::Matrix::translate(newPos));
-
-        // }
-        // ballMatrix->;
-
-        // osg::ref_ptr<osg::Geode> geode = node->asGeode();
-        // osg::ref_ptr<osg::MatrixTransform> matrix = new osg::MatrixTransform();
-        // matrix->addChild(matrix);
-        // std::cout << "Hello world" << std::endl;
-        // matrix->setMatrix(osg::Matrix::translate(osg::Vec3f(2.0, 2.0, 0)));
-        // std::cout << matrix << std::endl;
-    }
-};
-
-// class PointOfViewHandler : public osgGA::GUIEventHandler
-// {
-//     osg::observer_ptr<osgViewer::Viewer> _viewer;
-//     bool allowEventFocus;
-
-// public:
-//     bool handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
-//     {
-//         if (ea.getEventType() != osgGA::GUIEventAdapter::KEYDOWN)
-//         {
-//             return false;
-//         }
-
-//         switch (ea.getUnmodifiedKey())
-//         {
-//         case osgGA::GUIEventAdapter::KEY_Up:
-//             std::cout << "Key up " << allowEventFocus << std::endl;
-//             break;
-//         case osgGA::GUIEventAdapter::KEY_Right:
-//             std::cout << "Key right" << std::endl;
-//             break;
-//         case osgGA::GUIEventAdapter::KEY_Down:
-//             std::cout << "Key down" << std::endl;
-//             break;
-//         case osgGA::GUIEventAdapter::KEY_Left:
-//             std::cout << "Key left" << std::endl;
-//             break;
-//         case osgGA::GUIEventAdapter::KEY_Space:
-//             std::cout << "Space" << std::endl;
-//             break;
-//         default:
-//             return false;
-//         }
-
-//         return true;
-//     }
-
-//     PointOfViewHandler(const osg::ref_ptr<osgViewer::Viewer> &viewer)
-//     {
-//         _viewer = viewer;
-//         allowEventFocus = true;
-
-//         _viewer->getCamera()->setAllowEventFocus(allowEventFocus);
-//     }
-
-// protected:
-//     virtual ~PointOfViewHandler()
-//     {
-//     }
-// };
-
-// class Player
-// {
-//     osg::ref_ptr<osgViewer::Viewer> _viewer;
-//     PointOfViewHandler* _pointOfViewHandler;
-
-// public:
-//     Player(osg::ref_ptr<osgViewer::Viewer> viewer)
-//     {
-//         _viewer = viewer;
-//         _pointOfViewHandler = new PointOfViewHandler(_viewer);
-        
-//     }
-// };
-
-
-osg::ref_ptr<osg::MatrixTransform> createCannon(osg::Vec3f defaultPosition = osg::Vec3f(0, -20, 0))
-{
-    osg::ref_ptr<osg::MatrixTransform> cannonMatrix = new osg::MatrixTransform;
-
-    const float wheelRadius = 0.8f;
-    const float wheelThickness = 0.45f;
-    const float rotationAngle = osg::PI_2;
-    const float barrelRadius = 0.3f;
-    const float barrelWidth = 5.f;
-    const float barrelRotationAngle = -0.8 * osg::PI_2;
-
-    osg::ref_ptr<osg::Cylinder> leftWheelCylinder = new osg::Cylinder(
-        defaultPosition + osg::Vec3f(-wheelThickness, 0, 0), wheelRadius, wheelThickness);
-    leftWheelCylinder->setRotation(osg::Quat(rotationAngle, osg::Y_AXIS));
-    osg::ref_ptr<osg::ShapeDrawable> leftWheel = new osg::ShapeDrawable(leftWheelCylinder);
-    leftWheel->setColor(getColor(205, 133, 63));
-
-    osg::ref_ptr<osg::Cylinder> rightWheelCylinder = new osg::Cylinder(
-        defaultPosition + osg::Vec3f(wheelThickness, 0, 0), wheelRadius, wheelThickness);
-    rightWheelCylinder->setRotation(osg::Quat(rotationAngle, osg::Y_AXIS));
-    osg::ref_ptr<osg::ShapeDrawable> rightWheel = new osg::ShapeDrawable(rightWheelCylinder);
-    rightWheel->setColor(getColor(205, 133, 63));
-
-    osg::ref_ptr<osg::Cylinder> barrelCylinder = new osg::Cylinder(
-        defaultPosition + osg::Vec3f(0, barrelWidth / 2.f - barrelWidth / 4.f, wheelRadius + barrelRadius),
-        barrelRadius, barrelWidth);
-    barrelCylinder->setRotation(osg::Quat(barrelRotationAngle, osg::X_AXIS));
-    osg::ref_ptr<osg::ShapeDrawable> barrel = new osg::ShapeDrawable(barrelCylinder);
-    barrel->setColor(getColor(100, 100, 100));
-
-    cannonMatrix->addChild(leftWheel);
-    cannonMatrix->addChild(rightWheel);
-    cannonMatrix->addChild(barrel);
-
-    return cannonMatrix;
-}
-
 int main(int argc, char const *argv[])
 {
     osg::ref_ptr<osg::Group> root = new osg::Group;
@@ -402,22 +296,8 @@ int main(int argc, char const *argv[])
     osg::ref_ptr<osg::Group> shootingTargetMatrix = shootingTarget.getShootingTarget();
     osg::ref_ptr<osg::Geode> shootingTargetPlatformGeode = shootingTarget.getPlatform();
 
-    // osg::ref_ptr<osg::ShapeDrawable> yPoint = new osg::ShapeDrawable(
-    //     new osg::Sphere(osg::Vec3f(20, 0, 0), 1));
-    // yPoint->setColor(getColor(0, 255, 0));
-    // osg::ref_ptr<osg::MatrixTransform> matrix = new osg::MatrixTransform;
-    // matrix->addChild(yPoint);
-
-    float camYDistance = -40;
-
-    // osg::ref_ptr<osg::Sphere> sphere = new osg::Sphere(osg::Vec3f(0, camYDistance + 10, 0), 2);
-    // osg::ref_ptr<osg::ShapeDrawable> ball1 = new osg::ShapeDrawable(sphere);
-    // ball1->setColor(getColor(112, 255, 0));
-    // osg::ref_ptr<osg::MatrixTransform> ballMatrix1 = new osg::MatrixTransform;
-    // ballMatrix1->addChild(ball1);
-    // // root->addChild(ballMatrix1);
-
-    osg::ref_ptr<osg::MatrixTransform> cannonMatrix = createCannon();
+    Cannon cannon;
+    osg::ref_ptr<osg::MatrixTransform> cannonMatrix = cannon.getMatrixTransform();
 
     // SomeCallback ball(ground);
     root->addChild(ground);
@@ -429,6 +309,7 @@ int main(int argc, char const *argv[])
 
     osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer();
     Player player(viewer);
+    const float camYDistance = -40;
     viewer->addEventHandler(player.getPointOfViewHandler());
 
     viewer->setUpViewInWindow(100, 100, 800, 600);
