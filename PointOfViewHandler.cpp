@@ -12,6 +12,8 @@ bool PointOfViewHandler::handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActi
     {
     case osgGA::GUIEventAdapter::KEY_Up:
         std::cout << "Key up " << allowEventFocus << std::endl;
+        _player->shoot();
+        // aa.requestRedraw();
         break;
     case osgGA::GUIEventAdapter::KEY_Right:
         std::cout << "Key right" << std::endl;
@@ -28,6 +30,7 @@ bool PointOfViewHandler::handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActi
     default:
         return false;
     }
+
 
     return true;
 }

@@ -16,6 +16,7 @@
 #include "Player.hpp"
 #include "Cannon.hpp"
 #include "Utility.hpp"
+#include "Ball.hpp"
 
 class SomeCallback : public osg::NodeCallback
 {
@@ -296,8 +297,10 @@ int main(int argc, char const *argv[])
     osg::ref_ptr<osg::Group> shootingTargetMatrix = shootingTarget.getShootingTarget();
     osg::ref_ptr<osg::Geode> shootingTargetPlatformGeode = shootingTarget.getPlatform();
 
-    Cannon cannon;
-    osg::ref_ptr<osg::MatrixTransform> cannonMatrix = cannon.getMatrixTransform();
+
+
+    // Cannon cannon;
+    // osg::ref_ptr<osg::MatrixTransform> cannonMatrix = cannon.getMatrixTransform();
 
     // SomeCallback ball(ground);
     root->addChild(ground);
@@ -305,12 +308,25 @@ int main(int argc, char const *argv[])
     root->addChild(shootingTargetPlatformGeode);
     root->addChild(coordinateSystem);
     // root->addChild(ball.ballMatrix.get());
-    root->addChild(cannonMatrix);
+    // root->addChild(cannonMatrix);
+
+    // cannon.setRotation(-90);
+    // Ball* ball = cannon.getBall();
+    // root->addChild(ball->ballMatrix);
+    // Ball ball;
+    // root->addChild(ball.ballMatrix);
+    
 
     osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer();
-    Player player(viewer);
+    Player* player = new Player(viewer, root);
     const float camYDistance = -40;
-    viewer->addEventHandler(player.getPointOfViewHandler());
+    viewer->addEventHandler(player->getPointOfViewHandler());
+
+    Cannon* cannon = player->getCannon();
+    cannon->setRotation(-45);
+    root->addChild(cannon->getMatrixTransform());
+    root->addChild(cannon->getBall()->ballMatrix);
+
 
     viewer->setUpViewInWindow(100, 100, 800, 600);
     viewer->getCamera()->setViewMatrix(osg::Matrix::lookAt(
