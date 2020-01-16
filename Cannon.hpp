@@ -24,11 +24,12 @@ private:
     float BarrelRotationAngle;
 
     osg::Vec3f barrelAnchor;
-    osg::ref_ptr<osg::Cylinder> barrelCylinder;
-    osg::ref_ptr<osg::Geode> barrelGeode;
-    osg::ref_ptr<osg::MatrixTransform> barrelMatrix;
+    osg::ref_ptr<osg::MatrixTransform> _barrelMatrixTransform;
     osg::ref_ptr<osg::Group> _world;
     osg::Vec3f _position;
+
+    osg::ref_ptr<osg::ShapeDrawable> createWheelShapeDrawable(Direction direction);
+    osg::ref_ptr<osg::MatrixTransform> createBarrelMatrixTransform();
 
 public:
     Cannon(osg::ref_ptr<osg::Group> world, osg::Vec3f position = osg::Vec3f(0, -20, 0));
