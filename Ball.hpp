@@ -11,82 +11,77 @@
 
 class Ball : public osg::NodeCallback
 {
-public:
-    osg::ref_ptr<osg::MatrixTransform> ballMatrix;
-    osg::ref_ptr<osg::Geode> geode;
-    float speed;
-    float radius;
-    bool finished;
-    float xSpeed;
-    float angle;
-    float ySpeed;
-    float zSpeed;
+private:
+    const float _gravity;
+
     osg::ref_ptr<osg::Group> _world;
-    osg::Timer timer;
+    osg::ref_ptr<osg::MatrixTransform> _ballMatrixTransform;
+    osg::ref_ptr<osg::Geode> _ballGeode;
 
-    Ball(osg::ref_ptr<osg::Group> world, osg::Vec3f position = osg::Vec3f(0, 0, 6))
+    osg::Timer _timer;
+    float _radius;
+    bool _isFalling;
+    osg::Vec3f _velocity;
+
+public:
+    Ball(osg::ref_ptr<osg::Group> world,
+         osg::Vec3f startPosition,
+         float radius,
+         osg::Vec3f velocity) : _gravity(-0.01),
+                                _world(world),
+                                _radius(radius),
+                                _velocity(velocity)
+
     {
-        xSpeed = 0.03;
-        finished = false;
-        speed = 0.4;
-        radius = 0.4;
-        _world = world;
+        _isFalling = true;
 
-        // ---------------------------------------------
-
-        angle = degreesToRadians(45);
-        zSpeed = sin(angle) * 0.5;
-        ySpeed = cos(angle) * 0.5;
-
-        osg::ref_ptr<osg::Sphere> sphere = new osg::Sphere(position, radius);
-        // ball = new osg::ShapeDrawable(sphere);
-        osg::ref_ptr<osg::ShapeDrawable> ball = new osg::ShapeDrawable(sphere);
+        osg::ref_ptr<osg::ShapeDrawable> ball = new osg::ShapeDrawable(
+            new osg::Sphere(startPosition, radius));
         ball->setColor(getColor(112, 255, 0));
-        geode = new osg::Geode;
-        geode->addDrawable(ball.get());
+        _ballGeode = new osg::Geode;
+        _ballGeode->addDrawable(ball.get());
 
-        ballMatrix = new osg::MatrixTransform;
-        ballMatrix->addChild(geode);
-        ballMatrix->setUpdateCallback(this);
-        _world->addChild(ballMatrix);
+        _ballMatrixTransform = new osg::MatrixTransform;
+        _ballMatrixTransform->addChild(_ballGeode);
+        _ballMatrixTransform->setUpdateCallback(this);
+        _world->addChild(_ballMatrixTransform);
     }
 
     void operator()(osg::Node *node, osg::NodeVisitor *nv)
     {
-        if (finished)
+        if (_isFalling == false)
         {
-            if (timer.time_m() > 2 * 1000)
+            if (_timer.time_m() > 2 * 1000)
             {
-                std::cout << "in ball: " << ballMatrix << std::endl;
-                ballMatrix->removeChild(geode);
-                _world->removeChild(ballMatrix);
-                ballMatrix->removeUpdateCallback(this);
+                _ballMatrixTransform->removeChild(_ballGeode);
+                _world->removeChild(_ballMatrixTransform);
+                _ballMatrixTransform->removeUpdateCallback(this);
             }
+            
             return;
         }
 
-        float gravity = -0.01;
+        _velocity += osg::Vec3f(0, 0, _gravity);
 
-        zSpeed += gravity;
-
-        // std::cout << ballMatrix->getBound().center().x() << ", " << ballMatrix->getBound().center().y() << ", " << ballMatrix->getBound().center().z() << std::endl;
-
-        if (ballMatrix->getBound().center().z() < radius)
+        if (_ballMatrixTransform->getBound().center().z() < _radius)
         {
-            osg::Vec3f pos = ballMatrix->getMatrix().getTrans();
-            float diff = -ballMatrix->getBound().center().z();
-            pos += osg::Vec3f(0, 0, diff + radius);
-            ballMatrix->setMatrix(osg::Matrix::translate(pos));
-            finished = true;
+            osg::Vec3f ballPosition = _ballMatrixTransform->getMatrix().getTrans();
+            osg::Vec3f newBallPosition =
+                ballPosition + osg::Vec3f(0, 0, _radius - _ballMatrixTransform->getBound().center().z());
+            _ballMatrixTransform->setMatrix(osg::Matrix::translate(newBallPosition));
 
-            timer.setStartTick();
+            _isFalling = false;
+            _timer.setStartTick();
             return;
         }
 
-        osg::Vec3f pos = ballMatrix->getMatrix().getTrans();
-        osg::Vec3f newPos = pos + osg::Vec3f(0, ySpeed, zSpeed);
-        // std::cout << newPos.x() << ", " << newPos.y() << ", " << newPos.z() << std::endl;
-        ballMatrix->setMatrix(osg::Matrix::translate(newPos));
+        osg::Vec3f newPosition = _ballMatrixTransform->getMatrix().getTrans() + _velocity;
+        _ballMatrixTransform->setMatrix(osg::Matrix::translate(newPosition));
+    }
+
+    osg::ref_ptr<osg::MatrixTransform> getBallMatrixTransform()
+    {
+        return _ballMatrixTransform;
     }
 };
 

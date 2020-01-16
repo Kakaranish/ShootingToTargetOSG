@@ -75,11 +75,19 @@ public:
 
     Ball *createBall()
     {
-        // float xOffset =
-        float zOffset = BarrelWidth / 2 * sin((osg::PI_2 - abs(BarrelRotationAngle)));
-        float yOffset = BarrelWidth / 2 * cos((osg::PI_2 - abs(BarrelRotationAngle)));
-        osg::Vec3f ballPositionOffset(_position.x(), yOffset, zOffset);
-        return new Ball(_world, barrelAnchor + ballPositionOffset);
+        osg::Vec3f ballOffset(
+            _position.x(),
+            BarrelWidth / 2 * cos(osg::PI_2 - abs(BarrelRotationAngle)),
+            BarrelWidth / 2 * sin(osg::PI_2 - abs(BarrelRotationAngle)));
+        osg::Vec3f ballPosition = barrelAnchor + ballOffset;
+
+        const float speed = 0.5;
+        osg::Vec3f velocity(
+            0,
+            cos(BarrelRotationAngle) * speed,
+            sin(BarrelRotationAngle) * speed);
+
+        return new Ball(_world, ballPosition, 0.4, velocity);
     }
 
     osg::ref_ptr<osg::MatrixTransform> getMatrixTransform();

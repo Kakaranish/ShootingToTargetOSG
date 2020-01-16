@@ -26,8 +26,8 @@ public:
 
     void shoot(){
         Ball* ball = _cannon->createBall();
-        std::cout << "in player: " << ball->ballMatrix << std::endl;
-        _root->addChild(ball->ballMatrix);
+        std::cout << "in player: " << ball->getBallMatrixTransform() << std::endl;
+        _root->addChild(ball->getBallMatrixTransform());
     }
 
 
