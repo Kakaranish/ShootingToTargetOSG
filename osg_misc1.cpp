@@ -181,8 +181,7 @@ int main(int argc, char const *argv[])
     root->addChild(ground);
     root->addChild(shootingTargetMatrix);
     root->addChild(shootingTargetPlatformGeode);
-    
-    
+
     osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer();
     Player *player = new Player(viewer, root);
     viewer->addEventHandler(player->getPointOfViewHandler());
