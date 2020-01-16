@@ -81,11 +81,12 @@ public:
             BarrelWidth / 2 * sin(osg::PI_2 - abs(BarrelRotationAngle)));
         osg::Vec3f ballPosition = barrelAnchor + ballOffset;
 
-        const float speed = 0.5;
+        const float speed = 0.6;
+        std::cout << cos(BarrelRotationAngle) * speed << ", " << sin(BarrelRotationAngle) * speed << std::endl;
         osg::Vec3f velocity(
             0,
-            cos(BarrelRotationAngle) * speed,
-            sin(BarrelRotationAngle) * speed);
+            cos(osg::PI_2 - abs(BarrelRotationAngle)) * speed,
+            sin(osg::PI_2 - abs(BarrelRotationAngle)) * speed);
 
         return new Ball(_world, ballPosition, 0.4, velocity);
     }
