@@ -32,7 +32,7 @@ public:
 
 
     void moveCannon(float movement){
-        _cannon->move(osg::Vec3f(movement, 0, 0));
+        _cannon->move(movement);
     }
 
     void showElapsedTime(){

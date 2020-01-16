@@ -22,12 +22,14 @@ public:
     const float BarrelWidth;
     const float BarrelDefaultAngle;
     float BarrelRotationAngle;
+    float xOffset;
 
     osg::Vec3f barrelAnchor;
     osg::ref_ptr<osg::Cylinder> barrelCylinder;
     osg::ref_ptr<osg::Geode> barrelGeode;
     osg::ref_ptr<osg::MatrixTransform> barrelMatrix;
     osg::ref_ptr<osg::Group> _world;
+    osg::Vec3f _position;
 
     Cannon(osg::ref_ptr<osg::Group> world, osg::Vec3f position = osg::Vec3f(0, -20, 0))
         : WheelRadius(0.8f),
@@ -37,16 +39,20 @@ public:
           BarrelWidth(5.f),
           BarrelDefaultAngle(degreesToRadians(-45))
     {
+        // xPosition = position.x();
+        _position = position;
         BarrelRotationAngle = BarrelDefaultAngle;
         _world = world;
-        _cannonMatrix = createCannon();
+        _cannonMatrix = createCannon(_position);
     }
 
-    void move(osg::Vec3f movement)
+    void move(float xMovement)
     {
-        osg::Vec3f newPosition = _cannonMatrix->getMatrix().getTrans() + movement;
-        // barrelAnchor += movement;
-        
+        osg::Vec3f newPosition = _cannonMatrix->getMatrix().getTrans() +
+                                 osg::Vec3f(xMovement, 0.f, 0.f);
+
+        _position += osg::Vec3f(xMovement, 0, 0);
+
         _cannonMatrix->setMatrix(osg::Matrix::translate(newPosition));
     }
 
@@ -69,9 +75,10 @@ public:
 
     Ball *createBall()
     {
+        // float xOffset =
         float zOffset = BarrelWidth / 2 * sin((osg::PI_2 - abs(BarrelRotationAngle)));
         float yOffset = BarrelWidth / 2 * cos((osg::PI_2 - abs(BarrelRotationAngle)));
-        osg::Vec3f ballPositionOffset(0, yOffset, zOffset);
+        osg::Vec3f ballPositionOffset(_position.x(), yOffset, zOffset);
         return new Ball(_world, barrelAnchor + ballPositionOffset);
     }
 
