@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <osgViewer/Viewer>
+#include <osg/AnimationPath>
 
 class Player;
 
@@ -16,6 +17,7 @@ public:
     bool handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
     PointOfViewHandler(const osg::ref_ptr<osgViewer::Viewer> &viewer);
     void setPlayer(Player* player);
+    osg::ref_ptr<osg::AnimationPath> createAnimationPath(float time, float movement);
 };
 
 #endif

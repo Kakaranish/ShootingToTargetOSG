@@ -15,6 +15,8 @@ class Player
     osg::ref_ptr<osg::Group> _root;
 
 public:
+    osg::Timer timer;
+
     Player(osg::ref_ptr<osgViewer::Viewer> viewer, osg::ref_ptr<osg::Group> root);
 
     PointOfViewHandler *getPointOfViewHandler()
@@ -23,10 +25,20 @@ public:
     }
 
     void shoot(){
-        Ball* ball = _cannon->getBall();
+        Ball* ball = _cannon->createBall();
+        std::cout << "in player: " << ball->ballMatrix << std::endl;
         _root->addChild(ball->ballMatrix);
     }
 
+
+    void moveCannon(float movement){
+        _cannon->move(osg::Vec3f(movement, 0, 0));
+    }
+
+    void showElapsedTime(){
+        std::cout << timer.time_s() << std::endl;
+        timer.setStartTick();
+    }
 
     void rotateCannon(float degrees)
     {

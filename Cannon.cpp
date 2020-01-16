@@ -2,7 +2,6 @@
 
 osg::ref_ptr<osg::MatrixTransform> Cannon::createCannon(osg::Vec3f defaultPosition)
 {
-    barrelCenter = defaultPosition;
     osg::ref_ptr<osg::MatrixTransform> cannonMatrix = new osg::MatrixTransform;
 
     osg::ref_ptr<osg::Cylinder> leftWheelCylinder = new osg::Cylinder(
@@ -24,14 +23,25 @@ osg::ref_ptr<osg::MatrixTransform> Cannon::createCannon(osg::Vec3f defaultPositi
         osg::Vec3f(0,
                    (BarrelWidth / 2.f) - (BarrelWidth / 4.f),
                    WheelRadius + BarrelRadius);
-    barrelCylinder = new osg::Cylinder(barrelAnchor, BarrelRadius, BarrelWidth);
-    barrelCylinder->setRotation(osg::Quat(BarrelRotationAngle, osg::X_AXIS));
+    barrelCylinder = new osg::Cylinder(osg::Vec3f(), BarrelRadius, BarrelWidth);
+    // barrelCylinder->setRotation(osg::Quat(BarrelRotationAngle, osg::X_AXIS));
     osg::ref_ptr<osg::ShapeDrawable> barrel = new osg::ShapeDrawable(barrelCylinder);
     barrel->setColor(getColor(100, 100, 100));
 
+    barrelGeode = new osg::Geode;
+    barrelGeode->addChild(barrel);
+
+    barrelMatrix = new osg::MatrixTransform;
+    // std::cout << BarrelRotationAngle << std::endl;
+    barrelMatrix->setMatrix(
+        osg::Matrix::rotate(osg::Quat(BarrelRotationAngle, osg::X_AXIS)) *
+        osg::Matrix::translate(barrelAnchor));
+    barrelMatrix->addChild(barrel);
+
     cannonMatrix->addChild(leftWheel);
     cannonMatrix->addChild(rightWheel);
-    cannonMatrix->addChild(barrel);
+    cannonMatrix->addChild(barrelMatrix);
+    // _world->addChild(barrelMatrix);
 
     return cannonMatrix;
 }

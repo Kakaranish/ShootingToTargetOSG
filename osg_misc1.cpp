@@ -3,8 +3,8 @@
 #include <osgAnimation/BasicAnimationManager>
 #include <osgAnimation/UpdateMatrixTransform>
 #include <osgAnimation/StackedRotateAxisElement>
-#include <osgViewer/Viewer>
 #include <osg/AnimationPath>
+#include <osgViewer/Viewer>
 #include <algorithm>
 #include <osgDB/ReadFile>
 #include <osg/PositionAttitudeTransform>
@@ -297,8 +297,6 @@ int main(int argc, char const *argv[])
     osg::ref_ptr<osg::Group> shootingTargetMatrix = shootingTarget.getShootingTarget();
     osg::ref_ptr<osg::Geode> shootingTargetPlatformGeode = shootingTarget.getPlatform();
 
-
-
     // Cannon cannon;
     // osg::ref_ptr<osg::MatrixTransform> cannonMatrix = cannon.getMatrixTransform();
 
@@ -311,22 +309,15 @@ int main(int argc, char const *argv[])
     // root->addChild(cannonMatrix);
 
     // cannon.setRotation(-90);
-    // Ball* ball = cannon.getBall();
+    // Ball* ball = cannon.createBall();
     // root->addChild(ball->ballMatrix);
     // Ball ball;
     // root->addChild(ball.ballMatrix);
-    
 
     osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer();
-    Player* player = new Player(viewer, root);
+    Player *player = new Player(viewer, root);
     const float camYDistance = -40;
     viewer->addEventHandler(player->getPointOfViewHandler());
-
-    Cannon* cannon = player->getCannon();
-    cannon->setRotation(-45);
-    root->addChild(cannon->getMatrixTransform());
-    root->addChild(cannon->getBall()->ballMatrix);
-
 
     viewer->setUpViewInWindow(100, 100, 800, 600);
     viewer->getCamera()->setViewMatrix(osg::Matrix::lookAt(
