@@ -157,28 +157,6 @@ private:
     }
 };
 
-osg::ref_ptr<osg::Geode> createCoordinateSystem(float distanceFromZero, float sphereRadius = 1.f)
-{
-    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-
-    osg::ref_ptr<osg::ShapeDrawable> xPoint = new osg::ShapeDrawable(
-        new osg::Sphere(osg::Vec3f(distanceFromZero, 0, 0), sphereRadius));
-    xPoint->setColor(getColor(255, 0, 0));
-    geode->addDrawable(xPoint);
-
-    osg::ref_ptr<osg::ShapeDrawable> yPoint = new osg::ShapeDrawable(
-        new osg::Sphere(osg::Vec3f(0, distanceFromZero, 0), sphereRadius));
-    yPoint->setColor(getColor(0, 255, 0));
-    geode->addDrawable(yPoint);
-
-    osg::ref_ptr<osg::ShapeDrawable> zPoint = new osg::ShapeDrawable(
-        new osg::Sphere(osg::Vec3f(0, 0, distanceFromZero), sphereRadius));
-    zPoint->setColor(getColor(0, 0, 255));
-    geode->addDrawable(zPoint);
-
-    return geode.release();
-}
-
 osg::ref_ptr<osg::Geode> createGround(float width = 15.f, float height = 15.f)
 {
     const float axisRotationAngle = osg::PI;
@@ -194,36 +172,23 @@ osg::ref_ptr<osg::Geode> createGround(float width = 15.f, float height = 15.f)
 int main(int argc, char const *argv[])
 {
     osg::ref_ptr<osg::Group> root = new osg::Group;
-    osg::ref_ptr<osg::Geode> coordinateSystem = createCoordinateSystem(10, 0.5f);
     osg::ref_ptr<osg::Geode> ground = createGround(30);
 
     ShootingTarget shootingTarget(osg::Vec3f(0, 2.f, 0), 1.5, 0.1f);
     osg::ref_ptr<osg::Group> shootingTargetMatrix = shootingTarget.getShootingTarget();
     osg::ref_ptr<osg::Geode> shootingTargetPlatformGeode = shootingTarget.getPlatform();
 
-    // Cannon cannon;
-    // osg::ref_ptr<osg::MatrixTransform> cannonMatrix = cannon.getMatrixTransform();
-
-    // SomeCallback ball(ground);
     root->addChild(ground);
     root->addChild(shootingTargetMatrix);
     root->addChild(shootingTargetPlatformGeode);
-    root->addChild(coordinateSystem);
-    // root->addChild(ball.ballMatrix.get());
-    // root->addChild(cannonMatrix);
-
-    // cannon.setRotation(-90);
-    // Ball* ball = cannon.createBall();
-    // root->addChild(ball->ballMatrix);
-    // Ball ball;
-    // root->addChild(ball.ballMatrix);
-
+    
+    
     osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer();
     Player *player = new Player(viewer, root);
-    const float camYDistance = -40;
     viewer->addEventHandler(player->getPointOfViewHandler());
 
     viewer->setUpViewInWindow(100, 100, 800, 600);
+    const float camYDistance = -40;
     viewer->getCamera()->setViewMatrix(osg::Matrix::lookAt(
         osg::Vec3(0, -camYDistance, 2),
         osg::Vec3(0, 0, 0),
