@@ -25,11 +25,16 @@ osg::ref_ptr<osg::MatrixTransform> Cannon::createCannonMatrixTransform(osg::Vec3
 
     osg::ref_ptr<osg::ShapeDrawable> leftWheelShapeDrawable = createWheelShapeDrawable(LEFT, wheelRadius, wheelThickness);
     osg::ref_ptr<osg::ShapeDrawable> rightWheelShapeDrawable = createWheelShapeDrawable(RIGHT, wheelRadius, wheelThickness);
+    osg::ref_ptr<osg::Geode> wheelsGeode = new osg::Geode;
+    wheelsGeode->addDrawable(leftWheelShapeDrawable);
+    wheelsGeode->addDrawable(rightWheelShapeDrawable);
+    
     _barrelMatrixTransform = createBarrelMatrixTransform(barrelRadius);
 
     osg::ref_ptr<osg::MatrixTransform> cannonMatrix = new osg::MatrixTransform;
-    cannonMatrix->addChild(leftWheelShapeDrawable);
-    cannonMatrix->addChild(rightWheelShapeDrawable);
+    // cannonMatrix->addChild(leftWheelShapeDrawable);
+    // cannonMatrix->addChild(rightWheelShapeDrawable);
+    cannonMatrix->addChild(wheelsGeode);
     cannonMatrix->addChild(_barrelMatrixTransform);
 
     return cannonMatrix;
@@ -67,12 +72,14 @@ osg::ref_ptr<osg::MatrixTransform> Cannon::createBarrelMatrixTransform(float bar
         osg::Vec3f(0.f, 0.f, 0.f), barrelRadius, _barrelLength);
     osg::ref_ptr<osg::ShapeDrawable> barrelShapeDrawable = new osg::ShapeDrawable(barrelCylinder);
     barrelShapeDrawable->setColor(getColor(100, 100, 100));
+    osg::ref_ptr<osg::Geode> barrelGeode = new osg::Geode;
+    barrelGeode->addDrawable(barrelShapeDrawable);
 
     osg::ref_ptr<osg::MatrixTransform> barrelMatrixTransform = new osg::MatrixTransform;
     barrelMatrixTransform->setMatrix(
         osg::Matrix::rotate(osg::Quat(_barrelSkewAngle, osg::X_AXIS)) *
         osg::Matrix::translate(_barrelAnchor));
-    barrelMatrixTransform->addChild(barrelShapeDrawable);
+    barrelMatrixTransform->addChild(barrelGeode);
 
     return barrelMatrixTransform;
 }
