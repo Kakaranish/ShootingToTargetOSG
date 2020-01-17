@@ -29,7 +29,7 @@ public:
     }
 
     osg::ref_ptr<osg::Group> getRoot();
-    std::vector<ShootingTarget*> *getShootingTargets();
+    std::vector<ShootingTarget *> *getShootingTargets();
     osg::ref_ptr<osg::Geode> getGround();
 };
 
