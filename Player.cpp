@@ -1,9 +1,10 @@
 #include "Player.hpp"
 #include "PointOfViewHandler.hpp"
 
-Player::Player(osg::ref_ptr<osgViewer::Viewer> viewer, osg::ref_ptr<osg::Group> root)
+Player::Player(osg::ref_ptr<osgViewer::Viewer> viewer, World *world)
+    : _world(world)
 {
-    _root = root;
+    _root = world->getRoot();
     _pointOfViewHandler = new PointOfViewHandler(viewer);
     _pointOfViewHandler->setPlayer(this);
 

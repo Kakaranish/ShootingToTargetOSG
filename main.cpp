@@ -29,7 +29,7 @@ int main(int argc, char const *argv[])
     World world;
     osg::ref_ptr<osg::Group> root = world.getRoot();
     
-    Player *player = new Player(viewer, root);
+    Player *player = new Player(viewer, &world);
     viewer->addEventHandler(player->getPointOfViewHandler());
 
     viewer->setUpViewInWindow(100, 100, 800, 600);
