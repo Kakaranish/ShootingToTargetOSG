@@ -122,6 +122,10 @@
         "viewport": "cpp",
         "buffered_value": "cpp",
         "fast_back_stack": "cpp",
-        "observer_ptr": "cpp"
+        "observer_ptr": "cpp",
+        "ostream": "cpp",
+        "guieventhandler": "cpp",
+        "basicanimationmanager": "cpp",
+        "graphicswindow": "cpp"
     }
 }

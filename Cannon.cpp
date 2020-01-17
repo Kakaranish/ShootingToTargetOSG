@@ -1,11 +1,13 @@
 #include "Cannon.hpp"
 
 Cannon::Cannon(World* world, osg::Vec3f position)
-    : _defaultMovementGrowth(0.5),
-      _defaultSkewAngleGrowth(1),
-      _defaultBarrelSkewAngle(degreesToRadians(-60)),
+    : _defaultMovementGrowth(0.5f),
+      _defaultSkewAngleGrowth(1.f),
+      _defaultBarrelSkewAngle(degreesToRadians(-60.f)),
       _barrelLength(4.5f),
       _wheelRadius(0.8f),
+      _minBarrelSkewAngle(degreesToRadians(-80.f)),
+      _maxBarrelSkewAngle(degreesToRadians(-40.f)),
       _world(world),
       _position(position)
 
@@ -119,6 +121,12 @@ void Cannon::skewBarrel(Direction direction)
         skewAngle = -1 * _defaultSkewAngleGrowth;
     }
     else
+    {
+        return;
+    }
+
+    float newBarrelSkewAngle = _barrelSkewAngle + degreesToRadians(skewAngle);
+    if(newBarrelSkewAngle < _minBarrelSkewAngle || newBarrelSkewAngle > _maxBarrelSkewAngle)
     {
         return;
     }

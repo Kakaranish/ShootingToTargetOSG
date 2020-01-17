@@ -19,6 +19,9 @@ private:
     const float _defaultBarrelSkewAngle;
     const float _barrelLength;
     const float _wheelRadius;
+    const float _minBarrelSkewAngle;
+    const float _maxBarrelSkewAngle;
+    
 
     float _barrelSkewAngle;
 
