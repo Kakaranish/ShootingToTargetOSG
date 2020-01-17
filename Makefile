@@ -1,7 +1,7 @@
 # Makefile
 
 main:
-	g++ -std=c++98 -pedantic -Wall -Wl,--as-needed osg_misc1.cpp PointOfViewHandler.cpp Player.cpp Cannon.cpp Utility.cpp Ball.cpp ShootingTarget.cpp -losg -losgDB -losgFX -losgGA -losgParticle -losgSim -losgText -losgUtil -losgTerrain -losgManipulator -losgViewer -losgWidget -losgShadow -losgAnimation -losgVolume -lOpenThreads  -o osg_misc1
+	g++ -std=c++98 -pedantic -Wall -Wl,--as-needed osg_misc1.cpp PointOfViewHandler.cpp Player.cpp Cannon.cpp Utility.cpp Ball.cpp ShootingTarget.cpp World.cpp -losg -losgDB -losgFX -losgGA -losgParticle -losgSim -losgText -losgUtil -losgTerrain -losgManipulator -losgViewer -losgWidget -losgShadow -losgAnimation -losgVolume -lOpenThreads  -o osg_misc1
 
 clean:
 	rm -f osg_misc1
