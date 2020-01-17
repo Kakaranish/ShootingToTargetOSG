@@ -13,7 +13,7 @@ Ball::Ball(osg::ref_ptr<osg::Group> world,
 
     osg::ref_ptr<osg::ShapeDrawable> ball = new osg::ShapeDrawable(
         new osg::Sphere(startPosition, radius));
-    ball->setColor(getColor(112, 255, 0));
+    ball->setColor(getColor(60, 60, 60));
     _ballGeode = new osg::Geode;
     _ballGeode->addDrawable(ball.get());
 
