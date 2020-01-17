@@ -15,23 +15,7 @@ private:
                                           float thickness = 0.05f);
 
 public:
-    World()
-    {
-        _root = new osg::Group;
-
-        _ground = createGround(30, 60);
-        _root->addChild(_ground);
-
-        ShootingTarget *shootingTarget1 = new ShootingTarget(
-            osg::Vec3f(0, 2.f, 0), 1.5, 0.1f);
-        _root->addChild(shootingTarget1->getShootingTargetMatrixTransform());
-        _shootingTargets.push_back(shootingTarget1);
-
-        ShootingTarget *shootingTarget2 = new ShootingTarget(
-            osg::Vec3f(3.f, 7.f, 0), 1.5, 0.1f);
-        _root->addChild(shootingTarget2->getShootingTargetMatrixTransform());
-        _shootingTargets.push_back(shootingTarget2);
-    }
+    World();
 
     osg::ref_ptr<osg::Group> getRoot();
     std::vector<ShootingTarget *> *getShootingTargets();

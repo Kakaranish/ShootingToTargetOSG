@@ -1,5 +1,23 @@
 #include "World.hpp"
 
+World::World()
+{
+    _root = new osg::Group;
+
+    _ground = createGround(30, 100);
+    _root->addChild(_ground);
+
+    ShootingTarget *shootingTarget1 = new ShootingTarget(
+        osg::Vec3f(0, 2.f, 0), 1.5, 0.1f);
+    _root->addChild(shootingTarget1->getShootingTargetMatrixTransform());
+    _shootingTargets.push_back(shootingTarget1);
+
+    ShootingTarget *shootingTarget2 = new ShootingTarget(
+        osg::Vec3f(3.f, 7.f, 0), 1.5, 0.1f);
+    _root->addChild(shootingTarget2->getShootingTargetMatrixTransform());
+    _shootingTargets.push_back(shootingTarget2);
+}
+
 osg::ref_ptr<osg::Geode> World::createGround(float width, float height, float thickness)
 {
     const float axisRotationAngle = osg::PI;

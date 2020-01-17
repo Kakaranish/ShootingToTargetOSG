@@ -17,7 +17,7 @@ ShootingTarget::ShootingTarget(osg::Vec3f position, float radius, float thicknes
     osg::ref_ptr<osg::AnimationPath> animationPath = createAnimationPath(timeInSeconds);
     _apcb->setAnimationPath(animationPath);
     _apcb->setTimeOffset(randomInt(0, 4));
-    
+
     _movingElementsMatrixTransform->setUpdateCallback(_apcb.get());
 }
 

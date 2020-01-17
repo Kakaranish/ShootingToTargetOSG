@@ -46,10 +46,10 @@ int main(int argc, char const *argv[])
         }
         else if (arg == "-l")
         {
-            const float camYDistance = -40;
+            const float camYDistance = -28;
             viewer->getCamera()->setViewMatrix(osg::Matrix::lookAt(
-                osg::Vec3(0, camYDistance, 2),
-                osg::Vec3(0, 0, 0),
+                osg::Vec3(0, camYDistance, 3.5),
+                osg::Vec3(0, 0, 3),
                 osg::Vec3(0, -1, 1)));
             viewer->setRunFrameScheme(osgViewer::Viewer::ON_DEMAND);
 
