@@ -21,6 +21,7 @@ public:
 
     PointOfViewHandler *getPointOfViewHandler();
     Cannon *getCannon();
+    osg::ref_ptr<osg::Group> getRoot();
 };
 
 #endif
