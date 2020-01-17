@@ -4,43 +4,42 @@ Cannon::Cannon(osg::ref_ptr<osg::Group> world, osg::Vec3f position)
     : _defaultMovementGrowth(0.5),
       _defaultSkewAngleGrowth(1),
       _defaultBarrelSkewAngle(degreesToRadians(-60)),
-      _barrelLength(5.f),
+      _barrelLength(4.5f),
+      _wheelRadius(0.8f),
       _world(world),
       _position(position)
 
 {
     _barrelSkewAngle = _defaultBarrelSkewAngle;
+    _position += osg::Vec3f(0.f, 0.f, _wheelRadius);
     _cannonMatrixTransform = createCannonMatrixTransform(_position);
 }
 
 osg::ref_ptr<osg::MatrixTransform> Cannon::createCannonMatrixTransform(osg::Vec3f defaultPosition)
 {
-    const float wheelRadius = 0.8f;
     const float wheelThickness = 0.45f;
     const float barrelRadius = 0.3f;
 
-    osg::Vec3f barrelAnchorOffset = osg::Vec3f(0, (_barrelLength / 2.f) - (_barrelLength / 4.f),
-                                               wheelRadius + barrelRadius);
-    _barrelAnchor = defaultPosition + barrelAnchorOffset;
-
-    osg::ref_ptr<osg::ShapeDrawable> leftWheelShapeDrawable = createWheelShapeDrawable(LEFT, wheelRadius, wheelThickness);
-    osg::ref_ptr<osg::ShapeDrawable> rightWheelShapeDrawable = createWheelShapeDrawable(RIGHT, wheelRadius, wheelThickness);
+    osg::ref_ptr<osg::ShapeDrawable> leftWheelShapeDrawable = createWheelShapeDrawable(LEFT, wheelThickness);
+    osg::ref_ptr<osg::ShapeDrawable> rightWheelShapeDrawable = createWheelShapeDrawable(RIGHT, wheelThickness);
     osg::ref_ptr<osg::Geode> wheelsGeode = new osg::Geode;
     wheelsGeode->addDrawable(leftWheelShapeDrawable);
     wheelsGeode->addDrawable(rightWheelShapeDrawable);
-    
+
+    osg::Vec3f barrelAnchorOffset = osg::Vec3f(0,
+                                               (_barrelLength / 2.f) - (_barrelLength / 4.f),
+                                               _wheelRadius);
+    _barrelAnchor = defaultPosition + barrelAnchorOffset;
     _barrelMatrixTransform = createBarrelMatrixTransform(barrelRadius);
 
     osg::ref_ptr<osg::MatrixTransform> cannonMatrix = new osg::MatrixTransform;
-    // cannonMatrix->addChild(leftWheelShapeDrawable);
-    // cannonMatrix->addChild(rightWheelShapeDrawable);
     cannonMatrix->addChild(wheelsGeode);
     cannonMatrix->addChild(_barrelMatrixTransform);
 
     return cannonMatrix;
 }
 
-osg::ref_ptr<osg::ShapeDrawable> Cannon::createWheelShapeDrawable(Direction direction, float wheelRadius, float wheelThickness)
+osg::ref_ptr<osg::ShapeDrawable> Cannon::createWheelShapeDrawable(Direction direction, float wheelThickness)
 {
     float multiplier = 0;
     if (direction == LEFT)
@@ -58,7 +57,7 @@ osg::ref_ptr<osg::ShapeDrawable> Cannon::createWheelShapeDrawable(Direction dire
 
     const float wheelCylinderRotationAngle = osg::PI_2;
     osg::Vec3f cylinderPosition = _position + osg::Vec3f(multiplier * wheelThickness, 0, 0);
-    osg::ref_ptr<osg::Cylinder> wheelCylinder = new osg::Cylinder(cylinderPosition, wheelRadius, wheelThickness);
+    osg::ref_ptr<osg::Cylinder> wheelCylinder = new osg::Cylinder(cylinderPosition, _wheelRadius, wheelThickness);
     wheelCylinder->setRotation(osg::Quat(wheelCylinderRotationAngle, osg::Y_AXIS));
     osg::ref_ptr<osg::ShapeDrawable> wheelShapeDrawable = new osg::ShapeDrawable(wheelCylinder);
     wheelShapeDrawable->setColor(getColor(205, 133, 63));

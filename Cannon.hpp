@@ -17,6 +17,7 @@ private:
     const float _defaultSkewAngleGrowth;
     const float _defaultBarrelSkewAngle;
     const float _barrelLength;
+    const float _wheelRadius;
 
     float _barrelSkewAngle;
 
@@ -25,8 +26,7 @@ private:
     osg::Vec3f _position;
     osg::Vec3f _barrelAnchor;
 
-    osg::ref_ptr<osg::ShapeDrawable> createWheelShapeDrawable(
-        Direction direction, float wheelRadius, float wheelThicknes);
+    osg::ref_ptr<osg::ShapeDrawable> createWheelShapeDrawable(Direction direction, float wheelThicknes);
     osg::ref_ptr<osg::MatrixTransform> createBarrelMatrixTransform(float radius);
 
 public:
