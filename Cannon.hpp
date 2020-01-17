@@ -3,9 +3,10 @@
 
 #include <osg/ShapeDrawable>
 #include <osg/MatrixTransform>
+#include <math.h>
 #include "Utility.hpp"
 #include "Ball.hpp"
-#include <math.h>
+#include "World.hpp"
 
 class Cannon
 {
@@ -22,7 +23,7 @@ private:
     float _barrelSkewAngle;
 
     osg::ref_ptr<osg::MatrixTransform> _barrelMatrixTransform;
-    osg::ref_ptr<osg::Group> _world;
+    World* _world;
     osg::Vec3f _position;
     osg::Vec3f _barrelAnchor;
 
@@ -30,7 +31,7 @@ private:
     osg::ref_ptr<osg::MatrixTransform> createBarrelMatrixTransform(float radius);
 
 public:
-    Cannon(osg::ref_ptr<osg::Group> world, osg::Vec3f position = osg::Vec3f(0, -20, 0));
+    Cannon(World* world, osg::Vec3f position = osg::Vec3f(0, -20, 0));
 
     void move(Direction direction);
     void skewBarrel(Direction direction);

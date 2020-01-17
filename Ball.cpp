@@ -1,13 +1,12 @@
 #include "Ball.hpp"
 
-Ball::Ball(osg::ref_ptr<osg::Group> world,
+Ball::Ball(World *world,
            osg::Vec3f startPosition,
            float radius,
            osg::Vec3f velocity) : _gravity(-0.01),
                                   _world(world),
                                   _radius(radius),
                                   _velocity(velocity)
-
 {
     _isFalling = true;
 
@@ -20,7 +19,7 @@ Ball::Ball(osg::ref_ptr<osg::Group> world,
     _ballMatrixTransform = new osg::MatrixTransform;
     _ballMatrixTransform->addChild(_ballGeode);
     _ballMatrixTransform->setUpdateCallback(this);
-    _world->addChild(_ballMatrixTransform);
+    _world->getRoot()->addChild(_ballMatrixTransform);
 }
 
 void Ball::operator()(osg::Node *node, osg::NodeVisitor *nv)
@@ -30,10 +29,9 @@ void Ball::operator()(osg::Node *node, osg::NodeVisitor *nv)
         if (_timer.time_m() > 2 * 1000)
         {
             _ballMatrixTransform->removeChild(_ballGeode);
-            _world->removeChild(_ballMatrixTransform);
             _ballMatrixTransform->removeUpdateCallback(this);
+            _world->getRoot()->removeChild(_ballMatrixTransform);
         }
-
         return;
     }
 

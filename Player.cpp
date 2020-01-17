@@ -8,14 +8,13 @@ Player::Player(osg::ref_ptr<osgViewer::Viewer> viewer, World *world)
     _pointOfViewHandler = new PointOfViewHandler(viewer);
     _pointOfViewHandler->setPlayer(this);
 
-    _cannon = new Cannon(_root);
+    _cannon = new Cannon(_world);
     _root->addChild(_cannon->getMatrixTransform());
 }
 
 void Player::shoot()
 {
-    Ball *ball = _cannon->createBall();
-    _root->addChild(ball->getBallMatrixTransform());
+    _cannon->createBall();
 }
 
 osg::ref_ptr<osg::Group> Player::getRoot()

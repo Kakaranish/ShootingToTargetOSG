@@ -6,15 +6,16 @@
 #include <osg/MatrixTransform>
 #include <osgViewer/Viewer>
 #include <iostream>
-#include "Utility.hpp"
 #include <math.h>
+#include "Utility.hpp"
+#include "World.hpp"
 
 class Ball : public osg::NodeCallback
 {
 private:
     const float _gravity;
 
-    osg::ref_ptr<osg::Group> _world;
+    World* _world;
     osg::ref_ptr<osg::MatrixTransform> _ballMatrixTransform;
     osg::ref_ptr<osg::Geode> _ballGeode;
 
@@ -24,7 +25,7 @@ private:
     osg::Vec3f _velocity;
 
 public:
-    Ball(osg::ref_ptr<osg::Group> world,
+    Ball(World* world,
          osg::Vec3f startPosition,
          float radius,
          osg::Vec3f velocity);

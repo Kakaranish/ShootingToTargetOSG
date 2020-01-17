@@ -1,6 +1,6 @@
 #include "Cannon.hpp"
 
-Cannon::Cannon(osg::ref_ptr<osg::Group> world, osg::Vec3f position)
+Cannon::Cannon(World* world, osg::Vec3f position)
     : _defaultMovementGrowth(0.5),
       _defaultSkewAngleGrowth(1),
       _defaultBarrelSkewAngle(degreesToRadians(-60)),
@@ -137,8 +137,7 @@ Ball *Cannon::createBall()
         _barrelLength / 2 * sin(osg::PI_2 - abs(_barrelSkewAngle)));
     osg::Vec3f ballPosition = _barrelAnchor + ballOffset;
 
-    const float speed = 0.6;
-    std::cout << cos(_barrelSkewAngle) * speed << ", " << sin(_barrelSkewAngle) * speed << std::endl;
+    const float speed = 0.75;
     osg::Vec3f velocity(
         0,
         cos(osg::PI_2 - abs(_barrelSkewAngle)) * speed,
