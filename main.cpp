@@ -1,13 +1,7 @@
-#include <osg/ShapeDrawable>
-#include <osg/MatrixTransform>
-#include <osgViewer/Viewer>
-#include <osg/Geode>
-#include <osg/Geometry>
 #include "PointOfViewHandler.hpp"
 #include "Player.hpp"
 #include "Utility.hpp"
 #include "World.hpp"
-
 
 void showHelpMessage()
 {
@@ -31,7 +25,6 @@ int main(int argc, char const *argv[])
     viewer->setUpViewInWindow(100, 100, 800, 600);
     viewer->setSceneData(root.get());
 
-    std::cout << argc << std::endl;
     if (argc == 1)
     {
         return viewer->run();
@@ -58,6 +51,7 @@ int main(int argc, char const *argv[])
             {
                 viewer->frame();
             }
+            return 0;
         }
         else
         {

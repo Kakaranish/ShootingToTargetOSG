@@ -37,6 +37,9 @@ void Ball::operator()(osg::Node *node, osg::NodeVisitor *nv)
 
     _velocity += osg::Vec3f(0, 0, _gravity);
 
+    // Check for collision here
+    // std::cout << _world->getShootingTargets()->size() << std::endl;
+
     if (_ballMatrixTransform->getBound().center().z() < _radius)
     {
         osg::Vec3f ballPosition = _ballMatrixTransform->getMatrix().getTrans();

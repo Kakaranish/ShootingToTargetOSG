@@ -6,7 +6,7 @@ Cannon::Cannon(World* world, osg::Vec3f position)
       _defaultBarrelSkewAngle(degreesToRadians(-60.f)),
       _barrelLength(4.5f),
       _wheelRadius(0.8f),
-      _minBarrelSkewAngle(degreesToRadians(-80.f)),
+      _minBarrelSkewAngle(degreesToRadians(-100.f)),
       _maxBarrelSkewAngle(degreesToRadians(-40.f)),
       _world(world),
       _position(position)
