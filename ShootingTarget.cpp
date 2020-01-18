@@ -24,8 +24,7 @@ ShootingTarget::ShootingTarget(osg::Vec3f position, float radius, float thicknes
 osg::ref_ptr<osg::Geode> ShootingTarget::createTargetGeode()
 {
     const float xAxisRotationAngle = osg::PI_2;
-    float targetZOffset = 1 * (_radius + getStickLength() + (getPlatformHeight() / 2.f));
-    osg::Vec3f targetPosition = _postion + osg::Vec3f(0, 0, targetZOffset);
+    osg::Vec3f targetPosition = osg::Vec3f(0, 0, _radius + getStickLength());
 
     osg::ref_ptr<osg::Cylinder> blueCylinderShape = new osg::Cylinder(
         targetPosition + osg::Vec3f(0, 0, 0), _radius, _thickness);
@@ -55,8 +54,8 @@ osg::ref_ptr<osg::Geode> ShootingTarget::createTargetGeode()
 
 osg::ref_ptr<osg::Geode> ShootingTarget::createStickGeode()
 {
-    float zOffset = 1 * (_radius + getStickLength() + (getPlatformHeight() / 2.f)) - 1 * (_radius + getStickLength() / 2.f);
-    osg::Vec3f stickPosition = _postion + osg::Vec3f(0, 0, zOffset);
+    float zOffset = _radius + getStickLength() - 1 * (_radius + getStickLength() / 2.f);
+    osg::Vec3f stickPosition = osg::Vec3f(0, 0, zOffset);
 
     osg::ref_ptr<osg::ShapeDrawable> stickShapeDrawable = new osg::ShapeDrawable(
         new osg::Box(stickPosition, _thickness * 3, _thickness, getStickLength()));
@@ -69,11 +68,12 @@ osg::ref_ptr<osg::Geode> ShootingTarget::createStickGeode()
 
 osg::ref_ptr<osg::Geode> ShootingTarget::createPlatformGeode()
 {
-    osg::Vec3f position(_postion);
-    position -= osg::Vec3f(0, 0, -1 * (getPlatformHeight() / 2.));
+    osg::Vec3f position(0, 0, getPlatformHeight() / 2.);
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-    osg::ref_ptr<osg::Box> box = new osg::Box(position, getPlatformWidth(),
-                                              getPlatformHeight(), getPlatformHeight());
+    osg::ref_ptr<osg::Box> box = new osg::Box(position,
+                                              getPlatformWidth(),
+                                              getPlatformHeight(),
+                                              getPlatformHeight());
     osg::ref_ptr<osg::ShapeDrawable> groundDrawable(new osg::ShapeDrawable(box));
     groundDrawable->setColor(getColor(169, 169, 169));
     geode->addDrawable(groundDrawable);
@@ -84,6 +84,7 @@ osg::ref_ptr<osg::MatrixTransform> ShootingTarget::createMovingElementsMatrixTra
 {
     osg::ref_ptr<osg::MatrixTransform> movingElementsMatrixTransform =
         new osg::MatrixTransform;
+    movingElementsMatrixTransform->setMatrix(osg::Matrix::translate(osg::Vec3f(0.f, 0.f, getPlatformHeight() / 2.f)));
     movingElementsMatrixTransform->addChild(_targetGeode);
     movingElementsMatrixTransform->addChild(_stickGeode);
     return movingElementsMatrixTransform;
@@ -129,10 +130,24 @@ osg::ref_ptr<osg::MatrixTransform> ShootingTarget::createShootingTargetMatrix()
 {
     osg::ref_ptr<osg::MatrixTransform> shootingTargetMatrixTransform =
         new osg::MatrixTransform;
+    shootingTargetMatrixTransform->setMatrix(osg::Matrix::translate(_postion));
     shootingTargetMatrixTransform->addChild(_movingElementsMatrixTransform);
     shootingTargetMatrixTransform->addChild(_platformGeode);
 
     return shootingTargetMatrixTransform;
+}
+
+bool ShootingTarget::targetCollidesWithPoint(osg::Vec3f point)
+{
+    if (_targetGeode->getBoundingBox().contains(point) == false)
+    {
+        return false;
+    }
+
+    osg::Vec3f targetCenter = _targetGeode->getBoundingBox().center();
+    float diffXSquare = pow(point.x() - targetCenter.x(), 2);
+    float diffYSquare = pow(point.z() - targetCenter.z(), 2);
+    return sqrt(diffXSquare + diffYSquare) < _radius;
 }
 
 osg::ref_ptr<osg::MatrixTransform> ShootingTarget::getShootingTargetMatrixTransform()
