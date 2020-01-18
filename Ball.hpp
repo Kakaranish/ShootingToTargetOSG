@@ -15,7 +15,7 @@ class Ball : public osg::NodeCallback
 private:
     const float _gravity;
 
-    World* _world;
+    World *_world;
     osg::ref_ptr<osg::MatrixTransform> _ballMatrixTransform;
     osg::ref_ptr<osg::Geode> _ballGeode;
 
@@ -24,8 +24,13 @@ private:
     bool _isFalling;
     osg::Vec3f _velocity;
 
+    osg::Vec3f getCurrentPosition();
+    osg::Vec3f calculateNextPosition();
+    ShootingTarget *getCollidingShootingTarget();
+    bool collidesWithShootingTarget(ShootingTarget *shootingTarget);
+
 public:
-    Ball(World* world,
+    Ball(World *world,
          osg::Vec3f startPosition,
          float radius,
          osg::Vec3f velocity);

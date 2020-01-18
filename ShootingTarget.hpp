@@ -35,13 +35,17 @@ private:
 
 public:
     ShootingTarget(osg::Vec3f position, float radius, float thickness = 0.5f);
-    bool targetCollidesWithPoint(osg::Vec3f point);
+    void showInfo();
 
     osg::ref_ptr<osg::MatrixTransform> getShootingTargetMatrixTransform();
     osg::ref_ptr<osg::MatrixTransform> getMovingElementsMatrixTransform();
     osg::ref_ptr<osg::Geode> getTargetGeode();
     osg::ref_ptr<osg::Geode> getPlatformGeode();
     osg::ref_ptr<osg::Geode> getStickGeode();
+    
+    osg::Vec3f getTargetCenter();
+    float getTotalTargetThickness();
+    float getTargetRadius();
 };
 
 #endif

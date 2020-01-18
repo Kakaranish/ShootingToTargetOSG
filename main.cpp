@@ -8,7 +8,7 @@ void showHelpMessage()
     std::cout << "Synopsis: " << std::endl;
     std::cout << "      ./main [option]" << std::endl;
     std::cout << "Available options: " << std::endl;
-    std::cout << "-h    shows help" << std::endl;
+    std::cout << "-h    show help" << std::endl;
     std::cout << "-l    set locked view" << std::endl;
 }
 

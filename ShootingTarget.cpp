@@ -24,10 +24,10 @@ ShootingTarget::ShootingTarget(osg::Vec3f position, float radius, float thicknes
 osg::ref_ptr<osg::Geode> ShootingTarget::createTargetGeode()
 {
     const float xAxisRotationAngle = osg::PI_2;
-    osg::Vec3f targetPosition = osg::Vec3f(0, 0, _radius + getStickLength());
+    osg::Vec3f targetPosition = osg::Vec3f(0, 0, getPlatformHeight() + getStickLength() + _radius);
 
     osg::ref_ptr<osg::Cylinder> blueCylinderShape = new osg::Cylinder(
-        targetPosition + osg::Vec3f(0, 0, 0), _radius, _thickness);
+        targetPosition, _radius, _thickness);
     blueCylinderShape->setRotation(osg::Quat(xAxisRotationAngle, osg::X_AXIS));
     osg::ref_ptr<osg::ShapeDrawable> blueCylinder = new osg::ShapeDrawable(blueCylinderShape);
     blueCylinder->setColor(getColor(30, 144, 255, 255));
@@ -55,7 +55,7 @@ osg::ref_ptr<osg::Geode> ShootingTarget::createTargetGeode()
 osg::ref_ptr<osg::Geode> ShootingTarget::createStickGeode()
 {
     float zOffset = _radius + getStickLength() - 1 * (_radius + getStickLength() / 2.f);
-    osg::Vec3f stickPosition = osg::Vec3f(0, 0, zOffset);
+    osg::Vec3f stickPosition = osg::Vec3f(0, 0, getPlatformHeight() + zOffset);
 
     osg::ref_ptr<osg::ShapeDrawable> stickShapeDrawable = new osg::ShapeDrawable(
         new osg::Box(stickPosition, _thickness * 3, _thickness, getStickLength()));
@@ -84,7 +84,6 @@ osg::ref_ptr<osg::MatrixTransform> ShootingTarget::createMovingElementsMatrixTra
 {
     osg::ref_ptr<osg::MatrixTransform> movingElementsMatrixTransform =
         new osg::MatrixTransform;
-    movingElementsMatrixTransform->setMatrix(osg::Matrix::translate(osg::Vec3f(0.f, 0.f, getPlatformHeight() / 2.f)));
     movingElementsMatrixTransform->addChild(_targetGeode);
     movingElementsMatrixTransform->addChild(_stickGeode);
     return movingElementsMatrixTransform;
@@ -137,22 +136,33 @@ osg::ref_ptr<osg::MatrixTransform> ShootingTarget::createShootingTargetMatrix()
     return shootingTargetMatrixTransform;
 }
 
-bool ShootingTarget::targetCollidesWithPoint(osg::Vec3f point)
+void ShootingTarget::showInfo()
 {
-    if (_targetGeode->getBoundingBox().contains(point) == false)
-    {
-        return false;
-    }
+    osg::Vec3f targetBBCenter = _targetGeode->getBoundingBox().center();
+    std::cout << "Target BB Center: " << targetBBCenter.x() << ", " << targetBBCenter.y() << ", " << targetBBCenter.z() << std::endl;
 
-    osg::Vec3f targetCenter = _targetGeode->getBoundingBox().center();
-    float diffXSquare = pow(point.x() - targetCenter.x(), 2);
-    float diffYSquare = pow(point.z() - targetCenter.z(), 2);
-    return sqrt(diffXSquare + diffYSquare) < _radius;
+    std::cout << "Target BB: \txMin=" << _targetGeode->getBoundingBox().xMin() << "\txMax=" << _targetGeode->getBoundingBox().xMax() << std::endl;
+    std::cout << "Target BB: \tyMin=" << _targetGeode->getBoundingBox().yMin() << "\tyMax=" << _targetGeode->getBoundingBox().yMax() << std::endl;
+    std::cout << "Target BB: \tzMin=" << _targetGeode->getBoundingBox().zMin() << "\tzMax=" << _targetGeode->getBoundingBox().zMax() << std::endl;
+
+    osg::Vec3f movingElementsTrans = _movingElementsMatrixTransform->getMatrix().getTrans();
+    std::cout << "Moving elements trans: " << movingElementsTrans.x() << ", " << movingElementsTrans.y() << ", " << movingElementsTrans.z() << std::endl;
+
+    osg::Vec3f shootingTargetMatrixTrans = _shootingTargetMatrixTransform->getMatrix().getTrans();
+    std::cout << "Shooting target trans: " << shootingTargetMatrixTrans.x() << ", " << shootingTargetMatrixTrans.y() << ", " << shootingTargetMatrixTrans.z() << std::endl;
+
+    osg::Vec3f targetCenter = shootingTargetMatrixTrans + movingElementsTrans + targetBBCenter;
+    std::cout << "Target Center: " << targetCenter.x() << ", " << targetCenter.y() << ", " << targetCenter.z() << std::endl;
 }
 
 osg::ref_ptr<osg::MatrixTransform> ShootingTarget::getShootingTargetMatrixTransform()
 {
     return _shootingTargetMatrixTransform;
+}
+
+osg::ref_ptr<osg::MatrixTransform> ShootingTarget::getMovingElementsMatrixTransform()
+{
+    return _movingElementsMatrixTransform;
 }
 
 osg::ref_ptr<osg::Geode> ShootingTarget::getTargetGeode()
@@ -168,6 +178,24 @@ osg::ref_ptr<osg::Geode> ShootingTarget::getPlatformGeode()
 osg::ref_ptr<osg::Geode> ShootingTarget::getStickGeode()
 {
     return _stickGeode;
+}
+
+osg::Vec3f ShootingTarget::getTargetCenter()
+{
+    return _targetGeode->getBoundingBox().center() +
+           _movingElementsMatrixTransform->getMatrix().getTrans() +
+           _shootingTargetMatrixTransform->getMatrix().getTrans();
+}
+
+float ShootingTarget::getTotalTargetThickness()
+{
+    float diff = _targetGeode->getBoundingBox().yMax() - _targetGeode->getBoundingBox().yMin();
+    return abs(diff);
+}
+
+float ShootingTarget::getTargetRadius()
+{
+    return _radius;
 }
 
 float ShootingTarget::getPlatformWidth()
