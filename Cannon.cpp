@@ -141,15 +141,15 @@ Ball *Cannon::createBall()
 {
     osg::Vec3f ballOffset(
         _position.x(),
-        _barrelLength / 2 * cos(osg::PI_2 - abs(_barrelSkewAngle)),
-        _barrelLength / 2 * sin(osg::PI_2 - abs(_barrelSkewAngle)));
+        _barrelLength / 2.f * cos(osg::PI_2 - fabs(_barrelSkewAngle)),
+        _barrelLength / 2.f * sin(osg::PI_2 - fabs(_barrelSkewAngle)));
     osg::Vec3f ballPosition = _barrelAnchor + ballOffset;
 
     const float speed = 0.75;
     osg::Vec3f velocity(
         0,
-        cos(osg::PI_2 - abs(_barrelSkewAngle)) * speed,
-        sin(osg::PI_2 - abs(_barrelSkewAngle)) * speed);
+        cos(osg::PI_2 - fabs(_barrelSkewAngle)) * speed,
+        sin(osg::PI_2 - fabs(_barrelSkewAngle)) * speed);
 
     return new Ball(_world, ballPosition, 0.4, velocity);
 }
